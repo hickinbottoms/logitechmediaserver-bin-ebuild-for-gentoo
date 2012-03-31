@@ -31,7 +31,7 @@ DEPEND="
 RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
-	>=dev-lang/perl-5.8.8
+	>=dev-lang/perl-5.8.8[ithreads]
 	>=dev-perl/Data-UUID-1.202
 	"
 
@@ -51,7 +51,6 @@ DOCDIR="/usr/share/doc/${P}"
 LOGDIR="/var/log/${MY_PN}"
 
 pkg_setup() {
-
 	# Create the user and group if not already present
 	enewgroup ${RUN_GID}
 	enewuser ${RUN_UID} -1 -1 "/dev/null" ${RUN_GID}
