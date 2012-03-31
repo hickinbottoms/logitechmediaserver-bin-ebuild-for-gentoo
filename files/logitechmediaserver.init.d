@@ -1,32 +1,35 @@
 #!/sbin/runscript
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header$
 
-# These fit the Squeezebox Server ebuild and so shouldn't need to be changed;
-# user-servicable parts go in /etc/conf.d/squeezeboxserver.
-pidfile=/var/run/squeezeboxserver/squeezeboxserver.pid
-logdir=/var/log/squeezeboxserver
-varlibdir=/var/lib/squeezeboxserver
-cachedir=${varlibdir}/cache
-prefsdir=/etc/squeezeboxserver/prefs
-prefsfile=/etc/squeezeboxserver/squeezeboxserver.prefs
-scuser=squeezeboxserver
-scname=squeezeboxserver
+# These fit the Logitech Media Server ebuild and so shouldn't need to be
+# changed; user-servicable parts go in /etc/conf.d/logitechmediaserver.
+lms=logitechmediaserver
+rundir=/var/run/${lms}
+logdir=/var/log/${lms}
+optdir=/opt/${lms}
+etcdir=/etc/opt/${lms}
+vardir=/var/opt/${lms}
+pidfile=${varrundir}/${lms}.pid
+cachedir=${vardir}/cache
+prefsdir=${vardir}/prefs
+prefsfile=${prefsdir}/${lms}.prefs
+lmsuser=${lms}
+lmsbin=${optdir}/slimserver.pl
 
 depend() {
 	need net
-	use mysql
 }
 
 start() {
-	ebegin "Starting Squeezebox Server"
+	ebegin "Starting Logitech Media Server"
 
 	cd /
 	start-stop-daemon \
-		--start --exec /usr/sbin/${scname} \
+		--start --exec ${lmsbin} \
 		--pidfile ${pidfile} \
-		--user ${scuser} \
+		--user ${lmsuser} \
 		--background \
 		-- \
 		--quiet \
@@ -35,15 +38,15 @@ start() {
 		--prefsfile=${prefsfile} \
 		--prefsdir=${prefsdir} \
 		--logdir=${logdir} \
-		--audiodir=${SBS_MUSIC_DIR} \
-		--playlistdir=${SBS_PLAYLISTS_DIR} \
-		${SBS_OPTS}
+		--audiodir=${LMS_MUSIC_DIR} \
+		--playlistdir=${LMS_PLAYLISTS_DIR} \
+		${LMS_OPTS}
 
-	eend $? "Failed to start Squeezebox Server"
+	eend $? "Failed to start Logitech Media Server"
 }
 
 stop() {
-	ebegin "Stopping Squeezebox Server"
+	ebegin "Stopping Logitech Media Server"
 	start-stop-daemon --retry 10 --stop --pidfile ${pidfile}
-	eend $? "Failed to stop Squeezebox Server"
+	eend $? "Failed to stop Logitech Media Server"
 }
