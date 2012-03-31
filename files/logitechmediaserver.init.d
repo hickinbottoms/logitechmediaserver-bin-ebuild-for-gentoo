@@ -9,7 +9,6 @@ lms=logitechmediaserver
 rundir=/var/run/${lms}
 logdir=/var/log/${lms}
 optdir=/opt/${lms}
-etcdir=/etc/opt/${lms}
 vardir=/var/opt/${lms}
 pidfile=${varrundir}/${lms}.pid
 cachedir=${vardir}/cache

@@ -15,10 +15,9 @@ PS=patch_source
 PD=patch_dest
 
 PV=7.7.2
-P1=LogitechMediaServer-$(PV)
+P1=logitechmediaserver-bin-$(PV)
 
-FILES=logitechmediaserver.prefs \
-	  logitechmediaserver.init.d \
+FILES=logitechmediaserver.init.d \
 	  logitechmediaserver.conf.d \
 	  logitechmediaserver.logrotate.d \
 	  Gentoo-plugins-README.txt \

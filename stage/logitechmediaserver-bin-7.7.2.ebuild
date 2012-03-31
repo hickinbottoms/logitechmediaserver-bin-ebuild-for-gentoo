@@ -8,8 +8,8 @@ inherit eutils
 
 BUILD_NUM="33893"
 SRC_DIR="LogitechMediaServer_v${PV}"
-MY_P_BUILD_NUM="LogitechMediaServer-${PV}-${BUILD_NUM}"
 MY_PN="${PN/-bin}"
+MY_P_BUILD_NUM="${MY_PN}-${PV}-${BUILD_NUM}"
 MY_P="${MY_PN}-${PV}"
 
 DESCRIPTION="Logitech Meda Server music server"
@@ -28,11 +28,11 @@ DEPEND="
 	"
 
 # Runtime dependencies.
-#@@ Data::UUID?
 RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8
+	>=dev-perl/Data-UUID-1.202
 	"
 
 S="${WORKDIR}/${MY_P_BUILD_NUM}"
@@ -40,15 +40,13 @@ S="${WORKDIR}/${MY_P_BUILD_NUM}"
 RUN_UID=logitechmediaserver
 RUN_GID=logitechmediaserver
 
-ETCDIR="/etc/opt/${MY_PN}"
 OPTDIR="/opt/${MY_PN}"
 RUNDIR="/var/run/${MY_PN}"
 VARDIR="/var/opt/${MY_PN}"
 CACHEDIR="${VARDIR}/cache"
+PREFSDIR="${VARDIR}/prefs"
 PLUGINSDIR="${VARDIR}/plugins"
-PREFS="${ETCDIR}/${MY_PN}.prefs"
-PREFSDIR="${ETCDIR}/prefs"
-PREFS2="${PREFSDIR}/server.prefs"
+PREFS="${PREFSDIR}/${MY_PN}.prefs"
 DOCDIR="/usr/share/doc/${P}"
 LOGDIR="/var/log/${MY_PN}"
 
@@ -66,11 +64,9 @@ src_prepare() {
 
 src_install() {
 
-	# The custom OS module for Gentoo - provides OS-specific path details
-	cp "${FILESDIR}/gentoo-filepaths.pm" "Slim/Utils/OS/Custom.pm" || die "Unable to install Gentoo custom OS module"
-
 	# Everthing into our package in the /opt hierarchy (LHS)
-	cp -aR "${S}"/* "${ED}" || die "Unable to install package files"
+	dodir "${OPTDIR}"
+	cp -aR "${S}"/* "${ED}${OPTDIR}" || die "Unable to install package files"
 
 	# Documentation
 	dodoc Changelog*.html
@@ -78,15 +74,6 @@ src_install() {
 	dodoc License*.txt
 	dodoc "${FILESDIR}/Gentoo-plugins-README.txt"
 	dodoc "${FILESDIR}/Gentoo-detailed-changelog.txt"
-
-	# Configuration files and preferences
-	insinto "${ETCDIR}"
-	doins convert.conf
-	doins types.conf
-	doins modules.conf
-	newins "${FILESDIR}/squeezeboxserver.prefs" squeezeboxserver.prefs
-
-	#@@@TODO - do we need to remove these from {S} to avoid duplicates?
 
 	# Preferences directory
 	dodir "${PREFSDIR}"
