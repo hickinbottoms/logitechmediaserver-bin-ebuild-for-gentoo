@@ -1,0 +1,10 @@
+* TODO Fix QA warning about binaries
+
+- pre-stripped
+- writable sections
+- etc...
+
+* TODO Support MySQL
+
+- [ ] crib mysql/sqlite flag handling from scebuild
+- [ ] set up prefs as per old scebuild
