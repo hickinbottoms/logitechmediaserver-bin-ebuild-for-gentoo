@@ -35,6 +35,13 @@ RDEPEND="
 	>=dev-perl/Data-UUID-1.202
 	"
 
+# This is a binary package and contains prebuilt executable and library
+# files. We need to identify those to suppress the QA warnings during
+# installation.
+QA_PREBUILT="
+@@QA_PREBUILT@@
+"
+
 S="${WORKDIR}/${MY_P_BUILD_NUM}"
 
 RUN_UID=logitechmediaserver
@@ -45,7 +52,7 @@ RUNDIR="/var/run/${MY_PN}"
 VARDIR="/var/opt/${MY_PN}"
 CACHEDIR="${VARDIR}/cache"
 PREFSDIR="${VARDIR}/prefs"
-PLUGINSDIR="${VARDIR}/plugins"
+PLUGINSDIR="${VARDIR}/Plugins"
 PREFS="${PREFSDIR}/${MY_PN}.prefs"
 DOCDIR="/usr/share/doc/${P}"
 LOGDIR="/var/log/${MY_PN}"
@@ -115,6 +122,8 @@ src_install() {
 }
 
 pkg_postinst() {
-	einfo "Manually installed plugins should be placed in the following directory"
+	einfo ""
+	einfo "Manually installed plugins should be placed in the following directory:"
 	einfo " ${PLUGINSDIR}"
+	einfo ""
 }

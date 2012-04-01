@@ -7,16 +7,16 @@ in order that the installation complies with Gentoo's filesystem layout. These
 notes are provided to give guidance for installing plugins within this
 modified layout.
 
-INSTALLING PLUGINS
+MANUALLY INSTALLING PLUGINS
 
 The installation instructions of plugins should be followed but with the
 following Gentoo specifics:
 
 * Plugins should be installed into the directory:
-  /var/lib/logitechmediaserver/Plugins
+  /var/opt/logitechmediaserver/Plugins
 * Extension binaries (which sometimes accompany plugins) should be installed
   into the directory:
-  /usr/lib/logitechmediaserver/Bin
+  /opt/logitechmediaserver/Bin
 
 BACKGROUND
 

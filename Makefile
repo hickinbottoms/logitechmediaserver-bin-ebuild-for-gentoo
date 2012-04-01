@@ -5,6 +5,9 @@ VMHOST=chandra
 IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
 SCP=scp -i ~/.ssh/$(IDENT_HOST)
+DFDIR=distfiles
+GETCMD=aria2c --conditional-get=true --dir=$(DFDIR)
+RSYNC=rsync -az
 
 LOCAL_PORTAGE=/usr/local/portage
 EBUILD_PREFIX=logitechmediaserver-bin
@@ -15,7 +18,15 @@ PS=patch_source
 PD=patch_dest
 
 PV=7.7.2
+R=
+BUILD_NUM=33893
 P1=logitechmediaserver-bin-$(PV)
+P=logitechmediaserver
+DF=$(P)-$(PV).tgz
+SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
+SRC_DIR=LogitechMediaServer_v$(PV)
+P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM)
+EB=$(P1)$(R).ebuild
 
 FILES=logitechmediaserver.init.d \
 	  logitechmediaserver.conf.d \
@@ -25,25 +36,37 @@ FILES=logitechmediaserver.init.d \
 
 all: inject
 
-stage: patches
+prebuiltfiles.txt: $(DFDIR)/$(DF)
+	echo "Identifying prebuilt binaries in distfile"
+	./mkprebuilt $^ $(P_BUILD_NUM) opt/logitechmediaserver >$@
+
+stage: patches prebuiltfiles.txt
 	-rm -r stage/*
 	mkdir stage/files
-	cp metadata.xml *.ebuild stage
+	cp metadata.xml stage
 	cp files/* stage/files
 	cp patch_dest/* stage/files
 	A=`grep '$$Id' stage/files/*.patch | wc -l`; [ $$A -eq 0 ]
+	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB)" >"stage/$(EB)"
 
-inject: stage
+inject: stage inject_distfiles
 	echo Injecting ebuilds...
 	$(SSH) "rm -r $(EBUILD_DIR)/* >/dev/null 2>&1 || true"
 	$(SSH) mkdir -p $(EBUILD_DIR) $(EBUILD_DIR)/files
-	$(SCP) metadata.xml *.ebuild root@$(VMHOST):$(EBUILD_DIR)
+	$(SCP) metadata.xml root@$(VMHOST):$(EBUILD_DIR)
+	$(SCP) stage/$(EB) root@$(VMHOST):$(EBUILD_DIR)
 	(cd files; $(SCP) $(FILES) root@$(VMHOST):$(EBUILD_DIR)/files)
 	(cd patch_dest; $(SCP) *.patch root@$(VMHOST):$(EBUILD_DIR)/files)
 	$(SSH) 'cd $(EBUILD_DIR); ebuild `ls *.ebuild | head -n 1` manifest'
 	echo Unmasking ebuild...
 	$(SSH) mkdir -p /etc/portage
 	$(SCP) package.keywords package.use package.unmask root@$(VMHOST):/etc/portage
+
+inject_distfiles: $(DFDIR)/$(DF)
+	$(RSYNC) $^ root@$(VMHOST):/usr/portage/distfiles
+
+$(DFDIR)/$(DF):
+	$(GETCMD) "$(SRC_URI)"
 
 vmreset:
 	echo Resetting VM...
@@ -72,3 +95,4 @@ patches: $(PD)/$(P1)-uuid-gentoo.patch
 
 $(PD)/$(P1)-uuid-gentoo.patch: $(PS)/slimserver.pl
 	./mkpatch $@ $^
+

@@ -1,8 +1,52 @@
-* TODO Fix QA warning about binaries
+* DONE Fix QA warning about binaries
 
-- pre-stripped
-- writable sections
-- etc...
+Using =QA_PREBUILT= with a list of files is the solution.
+
+- [ ] pre-stripped:
+ * QA Notice: Pre-stripped files found:
+ * /opt/logitechmediaserver/Bin/arm-linux/sls
+ * /opt/logitechmediaserver/Bin/arm-linux/mac
+ * /opt/logitechmediaserver/Bin/arm-linux/wvunpack
+ * /opt/logitechmediaserver/Bin/arm-linux/flac
+ * /opt/logitechmediaserver/Bin/arm-linux/faad
+ * /opt/logitechmediaserver/Bin/arm-linux/sox
+ * /opt/logitechmediaserver/Bin/i386-freebsd-64int/sls
+ * /opt/logitechmediaserver/Bin/i386-freebsd-64int/mac
+ * /opt/logitechmediaserver/Bin/i386-freebsd-64int/wvunp
+ * ...
+  #+END_QUOTE:
+
+- [ ] runtime text relocations
+ * QA Notice: The following files contain runtime text relocations
+ *  Text relocations force the dynamic linker to perform extra
+ *  work at startup, waste system resources, and may pose a security
+ *  risk.  On some architectures, the code may not even function
+ *  properly, if at all.
+ *  For more information, see http://hardened.gentoo.org/pic-fix-guide.xml
+ *  Please include the following list of files in your report:
+ * TEXTREL opt/logitechmediaserver/CPAN/arch/5.10/arm-linux-gnueabi-thread-multi/auto/DBD/SQLite/SQLite.so
+ * TEXTREL opt/logitechmediaserver/CPAN/arch/5.10/arm-linux-gnueabi-thread-multi/auto/Media/Scan/Scan.so
+ * TEXTREL opt/logitechmediaserver/CPAN/arch/5.10/i386-linux-thread-multi/auto/Media/Scan/Scan.so
+ * ...
+
+- [ ] writable and executable sections
+ * QA Notice: The following files contain writable and executable sections
+ *  Files with such sections will not work properly (or at all!) on some
+ *  architectures/operating systems.  A bug should be filed at
+ *  http://bugs.gentoo.org/ to make sure the issue is fixed.
+ *  For more information, see http://hardened.gentoo.org/gnu-stack.xml
+ *  Please include the following list of files in your report:
+ *  Note: Bugs should be filed for the respective maintainers
+ *  of the package in question and not hardened@g.o.
+ * RWX --- --- opt/logitechmediaserver/Bin/arm-linux/sox
+ * RWX --- --- opt/logitechmediaserver/Bin/i386-freebsd-64int/flac
+ * RWX --- --- opt/logitechmediaserver/Bin/i386-linux/mac
+ * --- --- RWX opt/logitechmediaserver/Bin/sparc-linux/faad
+
+
+* TODO Test manually-installed plugins work
+
+To check that the path displayed during installation is correct
 
 * TODO Support MySQL
 
