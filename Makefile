@@ -32,7 +32,8 @@ FILES=logitechmediaserver.init.d \
 	  logitechmediaserver.conf.d \
 	  logitechmediaserver.logrotate.d \
 	  Gentoo-plugins-README.txt \
-	  Gentoo-detailed-changelog.txt
+	  Gentoo-detailed-changelog.txt \
+	  gentoo-filepaths.pm
 
 all: inject
 

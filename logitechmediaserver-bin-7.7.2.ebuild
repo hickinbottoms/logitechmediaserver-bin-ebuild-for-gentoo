@@ -70,6 +70,9 @@ src_prepare() {
 
 src_install() {
 
+	# The custom OS module for Gentoo - provides OS-specific path details
+	cp "${FILESDIR}/gentoo-filepaths.pm" "Slim/Utils/OS/Custom.pm" || die "Unable to install Gentoo custom OS module"
+
 	# Everthing into our package in the /opt hierarchy (LHS)
 	dodir "${OPTDIR}"
 	cp -aR "${S}"/* "${ED}${OPTDIR}" || die "Unable to install package files"
