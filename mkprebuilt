@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+# Identify the list of prebuild executables within a LMS distribution
+# tarball. This is used to populate the QA_PREBUILT variable in the
+# ebuild to suppress QA warnings during installation.
+
+# Usage:
+#  mkprebuilt [tarball] [tar-prefix-to-remove] [opt-prefix-to-add]
+#
+# Usage example:
+#  mkprebuilt distfiles/logitechmediaserver-7.7.2.tgz
+#             logitechmediaserver-7.7.2-33893
+#             opt/logitechmediaserverchandra
+
+use strict;
+use warnings;
+
+my $tgz=$ARGV[0];
+my $oldprefix=$ARGV[1];
+my $newprefix=$ARGV[2];
+
+my $tarcatcmd = "tar tf '" . $tgz . "'";
+
+open my $pipe, "$tarcatcmd |";
+while (<$pipe>) {
+	    my $line = $_;
+		$line =~ s/^$oldprefix\//$newprefix\//;
+
+		# The patterns that match prebuilt binary bits of the tarball.
+		/.so$/ && print "\t$line";
+		/Bin\/.*\/faad$/ && print "\t$line";
+		/Bin\/.*\/flac$/ && print "\t$line";
+		/Bin\/.*\/mac$/ && print "\t$line";
+		/Bin\/.*\/sls$/ && print "\t$line";
+		/Bin\/.*\/sox$/ && print "\t$line";
+		/Bin\/.*\/wvunpack$/ && print "\t$line";
+		/Bin\/.*\/mppdec$/ && print "\t$line";
+		/Bin\/.*\/aac2wav$/ && print "\t$line";
+		/Bin\/.*\/mp42aac$/ && print "\t$line";
+		/Bin\/.*\/alac$/ && print "\t$line";
+}
+close $pipe;

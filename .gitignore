@@ -1,1 +1,2 @@
-distfiles
+distfiles/*
+prebuiltfiles.txt
