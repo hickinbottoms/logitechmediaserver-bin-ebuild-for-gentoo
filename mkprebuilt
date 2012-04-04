@@ -10,7 +10,7 @@
 # Usage example:
 #  mkprebuilt distfiles/logitechmediaserver-7.7.2.tgz
 #             logitechmediaserver-7.7.2-33893
-#             opt/logitechmediaserverchandra
+#             opt/logitechmediaserver
 
 use strict;
 use warnings;

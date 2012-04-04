@@ -16,7 +16,7 @@ DESCRIPTION="Logitech Meda Server music server"
 HOMEPAGE="http://www.mysqueezebox.com/download"
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P}.tgz"
@@ -25,6 +25,7 @@ SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P}.tgz"
 DEPEND="
 	!media-sound/squeezecenter
 	!media-sound/squeezeboxserver
+	!media-sound/logitechmediaserver
 	"
 
 # Runtime dependencies.
@@ -54,7 +55,6 @@ CACHEDIR="${VARDIR}/cache"
 PREFSDIR="${VARDIR}/prefs"
 PLUGINSDIR="${VARDIR}/Plugins"
 PREFS="${PREFSDIR}/${MY_PN}.prefs"
-DOCDIR="/usr/share/doc/${P}"
 LOGDIR="/var/log/${MY_PN}"
 
 pkg_setup() {
