@@ -25,7 +25,6 @@ SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P}.tgz"
 DEPEND="
 	!media-sound/squeezecenter
 	!media-sound/squeezeboxserver
-	!media-sound/logitechmediaserver
 	"
 
 # Runtime dependencies.
@@ -50,11 +49,10 @@ RUN_GID=logitechmediaserver
 
 OPTDIR="/opt/${MY_PN}"
 RUNDIR="/var/run/${MY_PN}"
-VARDIR="/var/opt/${MY_PN}"
+VARDIR="/var/lib/${MY_PN}"
 CACHEDIR="${VARDIR}/cache"
-PREFSDIR="${VARDIR}/prefs"
 PLUGINSDIR="${VARDIR}/Plugins"
-PREFS="${PREFSDIR}/${MY_PN}.prefs"
+PREFSDIR="/etc/${MY_PN}"
 LOGDIR="/var/log/${MY_PN}"
 
 pkg_setup() {
