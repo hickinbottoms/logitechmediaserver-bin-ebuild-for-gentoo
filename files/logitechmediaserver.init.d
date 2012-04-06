@@ -9,11 +9,10 @@ lms=logitechmediaserver
 rundir=/var/run/${lms}
 logdir=/var/log/${lms}
 optdir=/opt/${lms}
-vardir=/var/opt/${lms}
+vardir=/var/lib/${lms}
 pidfile=${rundir}/${lms}.pid
 cachedir=${vardir}/cache
-prefsdir=${vardir}/prefs
-prefsfile=${prefsdir}/${lms}.prefs
+prefsdir=/etc/${lms}
 lmsuser=${lms}
 lmsbin=${optdir}/slimserver.pl
 
@@ -34,7 +33,6 @@ start() {
 		--quiet \
 		--pidfile=${pidfile} \
 		--cachedir=${cachedir} \
-		--prefsfile=${prefsfile} \
 		--prefsdir=${prefsdir} \
 		--logdir=${logdir} \
 		--audiodir=${LMS_MUSIC_DIR} \

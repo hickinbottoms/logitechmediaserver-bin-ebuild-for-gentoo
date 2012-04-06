@@ -1,6 +1,6 @@
 VIRSH_URI=qemu:///system
 VIRSH_DOMAIN=scebuild
-VIRSH_RESET_SNAPSHOT=clean-base-4
+VIRSH_RESET_SNAPSHOT=clean-base-5
 VMHOST=chandra
 IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
@@ -90,7 +90,7 @@ uninstall:
 	-$(SSH) /etc/init.d/logitechmediaserver stop
 	-$(SSH) emerge --unmerge logitechmediaserver-bin
 	-$(SSH) rm -fr /etc/init.d/logitechmediaserver /etc/conf.d/logitechmediaserver /etc/logrotate.d/logitechmediaserver
-	-$(SSH) rm -fr /var/log/logitechmediaserver /var/opt/logitechmediaserver /etc/logitechmediaserver
+	-$(SSH) rm -fr /etc/logitechmediaserver /var/log/logitechmediaserver /var/lib/logitechmediaserver /opt/logitechmediaserver
 
 patches: $(PD)/$(P1)-uuid-gentoo.patch
 

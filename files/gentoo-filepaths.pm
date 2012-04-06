@@ -19,8 +19,8 @@ sub initDetails {
 	$class->{osDetails}->{isGentoo} = 1 ;
 
 	# Ensure we find manually installed plugin files.
-	push @INC, '/var/opt/logitechmediaserver';
-	push @INC, '/var/opt/logitechmediaserver/Plugins';
+	push @INC, '/var/lib/logitechmediaserver';
+	push @INC, '/var/lib/logitechmediaserver/Plugins';
 
 	return $class->{osDetails};
 }
@@ -39,13 +39,20 @@ sub dirsFor {
 
 	my @dirs = ();
 	
-	# We basically override the location of plugins, but let the default Linux
-	# behaviour prevail for all other requests.
+	# Use the default behaviour to locate the directory.
 	push @dirs, $class->SUPER::dirsFor($dir);
+
+	# Overrides for specific directories.
 	if ($dir eq 'Plugins') {
-			
-		push @dirs, '/var/opt/logitechmediaserver/Plugins';
-		
+
+		# User-installed plugins are in a different place.
+		push @dirs, '/var/lib/logitechmediaserver/Plugins';
+
+	} elsif ($dir =~ /^(?:prefs)$/) {
+
+		# Server and plugin preferences are in a different place.
+		push @dirs, $::prefsdir || '/etc/logitechmediaserver';
+
 	}
 
 	return wantarray() ? @dirs : $dirs[0];
