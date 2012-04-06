@@ -1,6 +1,6 @@
 VIRSH_URI=qemu:///system
 VIRSH_DOMAIN=scebuild
-VIRSH_RESET_SNAPSHOT=clean-base-4
+VIRSH_RESET_SNAPSHOT=clean-base-5
 VMHOST=chandra
 IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
