@@ -48,7 +48,7 @@ stage: patches prebuiltfiles.txt
 	cp files/* stage/files
 	cp patch_dest/* stage/files
 	A=`grep '$$Id' stage/files/*.patch | wc -l`; [ $$A -eq 0 ]
-	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB)" >"stage/$(EB)"
+	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"stage/$(EB)"
 
 inject: stage inject_distfiles
 	echo Injecting ebuilds...
