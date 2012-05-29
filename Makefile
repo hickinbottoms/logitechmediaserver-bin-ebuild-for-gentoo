@@ -108,8 +108,11 @@ uninstall:
 	-$(SSH) rm -fr /etc/init.d/logitechmediaserver /etc/conf.d/logitechmediaserver /etc/logrotate.d/logitechmediaserver
 	-$(SSH) rm -fr /etc/logitechmediaserver /var/log/logitechmediaserver /var/lib/logitechmediaserver /opt/logitechmediaserver
 
-patches: $(PD)/$(P1)-uuid-gentoo.patch
+patches: $(PD)/$(P1)-client-playlists-gentoo.patch $(PD)/$(P1)-uuid-gentoo.patch
 
 $(PD)/$(P1)-uuid-gentoo.patch: $(PS)/slimserver.pl
+	./mkpatch $@ $^
+
+$(PD)/$(P1)-client-playlists-gentoo.patch: $(PS)/Slim/Player/Playlist.pm
 	./mkpatch $@ $^
 

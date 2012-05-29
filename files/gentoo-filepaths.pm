@@ -48,6 +48,14 @@ sub dirsFor {
 		# User-installed plugins are in a different place, so add it.
 		push @dirs, '/var/lib/logitechmediaserver/Plugins';
 
+	} elsif ($dir eq 'ClientPlaylists') {
+
+		# LMS would normally try to put client playlists in the prefs
+		# directory, but they aren't really prefs since they're dynamic
+		# state of the clients. Effectively, they're the same as the
+		# database cache, so we move these under /var/lib.
+		push @dirs, '/var/lib/logitechmediaserver/ClientPlaylists';
+
 	} elsif ($dir =~ /^(?:prefs)$/) {
 
 		# Server and plugin preferences are in a different place.
