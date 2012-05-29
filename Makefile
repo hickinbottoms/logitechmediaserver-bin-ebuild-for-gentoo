@@ -17,6 +17,12 @@ EBUILD_DIR=$(LOCAL_PORTAGE)/$(EBUILD_CATEGORY)
 PS=patch_source
 PD=patch_dest
 
+# PATCH_PV is the version that our diff patch is produced against. This allows
+# me to send Joe a patch that shows the changes I have made in just the stage
+# directory (ie ignoring all the ebuild generation crud and concentrating on
+# what would be in the portage tree).
+PATCH_PV=7.7.2
+
 PV=7.7.2
 R=
 BUILD_NUM=33893
@@ -36,6 +42,16 @@ FILES=logitechmediaserver.init.d \
 	  gentoo-filepaths.pm
 
 all: inject
+
+# Produce a patch I can send to Joe. This produces differences just for the
+# stage directory so this concentrates on the changes needed to the portage
+# folder only. This diffs the working tree's stage folder against a previous
+# formal git tag, so it first makes sure the stage folder reflects the
+# current working tree's version of the ebuild and the patches are generated
+# etc.
+portagepatch:
+	make stage >/dev/null
+	git diff --patch --stat $(PATCH_PV) -- stage
 
 prebuiltfiles.txt: $(DFDIR)/$(DF)
 	echo "Identifying prebuilt binaries in distfile"
