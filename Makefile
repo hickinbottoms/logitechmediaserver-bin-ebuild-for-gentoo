@@ -21,7 +21,7 @@ PD=patch_dest
 # me to send Joe a patch that shows the changes I have made in just the stage
 # directory (ie ignoring all the ebuild generation crud and concentrating on
 # what would be in the portage tree).
-PATCH_PV=7.7.2
+PATCH_PV=7.7.2-2
 
 PV=7.7.2
 R=
