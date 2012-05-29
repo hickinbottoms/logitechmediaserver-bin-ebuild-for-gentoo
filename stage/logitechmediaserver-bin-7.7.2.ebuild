@@ -12,7 +12,7 @@ MY_PN="${PN/-bin}"
 MY_P_BUILD_NUM="${MY_PN}-${PV}-${BUILD_NUM}"
 MY_P="${MY_PN}-${PV}"
 
-DESCRIPTION="Logitech Meda Server music server"
+DESCRIPTION="Logitech Media Server (streaming audio server)"
 HOMEPAGE="http://www.mysqueezebox.com/download"
 LICENSE="GPL-2"
 SLOT="0"
