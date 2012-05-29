@@ -20,6 +20,10 @@ depend() {
 	need net
 }
 
+start_pre() {
+	checkpath -q -d -o ${lmsuser}:${lmsuser} -m 0770 "${rundir}"
+}
+
 start() {
 	ebegin "Starting Logitech Media Server"
 
