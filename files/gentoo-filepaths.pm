@@ -38,20 +38,25 @@ sub dirsFor {
 	my ($class, $dir) = @_;
 
 	my @dirs = ();
-	
-	# Use the default behaviour to locate the directory.
-	push @dirs, $class->SUPER::dirsFor($dir);
 
 	# Overrides for specific directories.
 	if ($dir eq 'Plugins') {
 
-		# User-installed plugins are in a different place.
+		# Look in the normal places.
+		push @dirs, $class->SUPER::dirsFor($dir);
+
+		# User-installed plugins are in a different place, so add it.
 		push @dirs, '/var/lib/logitechmediaserver/Plugins';
 
 	} elsif ($dir =~ /^(?:prefs)$/) {
 
 		# Server and plugin preferences are in a different place.
 		push @dirs, $::prefsdir || '/etc/logitechmediaserver';
+
+	} else {
+
+		# Use the default behaviour to locate the directory.
+		push @dirs, $class->SUPER::dirsFor($dir);
 
 	}
 
