@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit eutils
+inherit eutils user
 
 BUILD_NUM="33893"
 SRC_DIR="LogitechMediaServer_v${PV}"
