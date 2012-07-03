@@ -32,6 +32,7 @@ RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
+	<dev-lang/perl-5.15[ithreads]
 	>=dev-perl/Data-UUID-1.202
 	"
 
