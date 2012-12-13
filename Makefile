@@ -87,7 +87,7 @@ $(DFDIR)/$(DF):
 
 vmreset:
 	echo Resetting VM...
-	sudo virsh snapshot-revert $(VIRSH_DOMAIN) $(VIRSH_RESET_SNAPSHOT)
+	virsh --connect $(VIRSH_URI) snapshot-revert $(VIRSH_DOMAIN) $(VIRSH_RESET_SNAPSHOT)
 
 vmstart:
 	echo Starting VM...
