@@ -11,8 +11,12 @@ RSYNC=rsync -az
 
 LOCAL_PORTAGE=/usr/local/portage
 EBUILD_PREFIX=logitechmediaserver-bin
-EBUILD_CATEGORY=media-sound/$(EBUILD_PREFIX)
+EBUILD_CATEGORY2=media-sound
+EBUILD_CATEGORY=$(EBUILD_CATEGORY2)/$(EBUILD_PREFIX)
 EBUILD_DIR=$(LOCAL_PORTAGE)/$(EBUILD_CATEGORY)
+STAGEDIR=$(EBUILD_CATEGORY)
+OVERLAY_DIR=$(HOME)/code/gentoo/squeezebox-overlay
+GPG_KEYID=6C0371E6
 
 PS=patch_source
 PD=patch_dest
@@ -24,7 +28,7 @@ PD=patch_dest
 PATCH_PV=7.7.2-2
 
 PV=7.7.2
-R=
+R=-r2
 BUILD_NUM=33893
 P1=logitechmediaserver-bin-$(PV)
 P=logitechmediaserver
@@ -50,34 +54,38 @@ all: inject
 # current working tree's version of the ebuild and the patches are generated
 # etc.
 portagepatch:
-	make stage >/dev/null
-	git diff --patch --stat $(PATCH_PV) -- stage
+	make $(STAGEDIR) >/dev/null
+	git diff --patch --stat $(PATCH_PV) -- $(STAGEDIR)
 
 prebuiltfiles.txt: $(DFDIR)/$(DF)
 	echo "Identifying prebuilt binaries in distfile"
 	./mkprebuilt $^ $(P_BUILD_NUM) opt/logitechmediaserver >$@
 
 stage: patches prebuiltfiles.txt
-	-rm -r stage/*
-	mkdir stage/files
-	cp metadata.xml stage
-	cp files/* stage/files
-	cp patch_dest/* stage/files
-	A=`grep '$$Id' stage/files/*.patch | wc -l`; [ $$A -eq 0 ]
-	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"stage/$(EB)"
+	-rm -r $(STAGEDIR)
+	mkdir -p $(STAGEDIR)/files
+	cp metadata.xml $(STAGEDIR)
+	cp files/* $(STAGEDIR)/files
+	cp patch_dest/* $(STAGEDIR)/files
+	A=`grep '$$Id' $(STAGEDIR)/files/*.patch | wc -l`; [ $$A -eq 0 ]
+	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"$(STAGEDIR)/$(EB)"
+	(cd $(STAGEDIR); ebuild `ls *.ebuild | head -n 1` manifest)
 
 inject: stage inject_distfiles
 	echo Injecting ebuilds...
 	$(SSH) "rm -r $(EBUILD_DIR)/* >/dev/null 2>&1 || true"
-	$(SSH) mkdir -p $(EBUILD_DIR) $(EBUILD_DIR)/files
-	$(SCP) metadata.xml root@$(VMHOST):$(EBUILD_DIR)
-	$(SCP) stage/$(EB) root@$(VMHOST):$(EBUILD_DIR)
-	(cd files; $(SCP) $(FILES) root@$(VMHOST):$(EBUILD_DIR)/files)
-	(cd patch_dest; $(SCP) *.patch root@$(VMHOST):$(EBUILD_DIR)/files)
-	$(SSH) 'cd $(EBUILD_DIR); ebuild `ls *.ebuild | head -n 1` manifest'
+	$(SSH) mkdir -p $(EBUILD_DIR)
+	$(SCP) -r $(STAGEDIR)/* root@$(VMHOST):$(EBUILD_DIR)
 	echo Unmasking ebuild...
 	$(SSH) mkdir -p /etc/portage
 	$(SCP) package.keywords package.use package.unmask root@$(VMHOST):/etc/portage
+
+overlay: stage
+	# The following ensures that we're on a feature branch
+	(cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* ]])
+	-rm -rf "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)" 2>/dev/null
+	cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
+	#(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
 
 inject_distfiles: $(DFDIR)/$(DF)
 	$(RSYNC) $^ root@$(VMHOST):/usr/portage/distfiles
@@ -87,7 +95,7 @@ $(DFDIR)/$(DF):
 
 vmreset:
 	echo Resetting VM...
-	sudo virsh snapshot-revert $(VIRSH_DOMAIN) $(VIRSH_RESET_SNAPSHOT)
+	virsh --connect $(VIRSH_URI) snapshot-revert $(VIRSH_DOMAIN) $(VIRSH_RESET_SNAPSHOT)
 
 vmstart:
 	echo Starting VM...
@@ -115,4 +123,3 @@ $(PD)/$(P1)-uuid-gentoo.patch: $(PS)/slimserver.pl
 
 $(PD)/$(P1)-client-playlists-gentoo.patch: $(PS)/Slim/Player/Playlist.pm
 	./mkpatch $@ $^
-

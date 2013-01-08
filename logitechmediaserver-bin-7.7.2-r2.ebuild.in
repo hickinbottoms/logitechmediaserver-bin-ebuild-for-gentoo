@@ -4,7 +4,7 @@
 
 EAPI="3"
 
-inherit eutils
+inherit eutils user
 
 BUILD_NUM="33893"
 SRC_DIR="LogitechMediaServer_v${PV}"
@@ -14,7 +14,8 @@ MY_P="${MY_PN}-${PV}"
 
 DESCRIPTION="Logitech Media Server (streaming audio server)"
 HOMEPAGE="http://www.mysqueezebox.com/download"
-LICENSE="GPL-2"
+LICENSE="${PN}"
+RESTRICT="bindist mirror"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
@@ -32,6 +33,7 @@ RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
+	<dev-lang/perl-5.15[ithreads]
 	>=dev-perl/Data-UUID-1.202
 	"
 
