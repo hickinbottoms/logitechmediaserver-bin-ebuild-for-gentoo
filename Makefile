@@ -29,6 +29,7 @@ PATCH_PV=7.7.2-4
 
 PV=7.7.3
 R=_alpha1
+R=_alpha2
 BUILD_NUM=1372939239
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)

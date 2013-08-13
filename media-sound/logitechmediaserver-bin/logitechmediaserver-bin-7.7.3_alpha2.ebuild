@@ -18,7 +18,11 @@ HOMEPAGE="http://www.mysqueezebox.com/download"
 LICENSE="${PN}"
 RESTRICT="bindist mirror"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+# TODO: Currently doesn't support amd64 because the binaries for that
+# are not packaged in the Logitech release tarball. Could be re-added
+# when they include those (they include the binaries for 5.16/x32 so I
+# think it's just an oversight for now.)
+KEYWORDS="~x86"
 IUSE=""
 
 SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P_BUILD_NUM}.tgz"
