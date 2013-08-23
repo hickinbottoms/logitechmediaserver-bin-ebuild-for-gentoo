@@ -28,14 +28,14 @@ PD=patch_dest
 PATCH_PV=7.7.2-4
 
 PV=7.7.3
-R=_alpha1
-R=_alpha2
-BUILD_NUM=1372939239
+#R=_alpha2
+R=
+BUILD_NUM=1375965195
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
-DF=$(P)-$(PV)-${BUILD_NUM}.tgz
-SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_Perl5.16/$(P)-$(PV)-${BUILD_NUM}.tgz
+DF=$(P)-$(PV).tgz
+SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
 P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM)
 EB=$(P1)$(R).ebuild
 
