@@ -25,16 +25,17 @@ PD=patch_dest
 # me to send Joe a patch that shows the changes I have made in just the stage
 # directory (ie ignoring all the ebuild generation crud and concentrating on
 # what would be in the portage tree).
-PATCH_PV=7.7.2-2
+PATCH_PV=7.7.2-4
 
-PV=7.7.2
-R=-r2
-BUILD_NUM=33893
+PV=7.7.3
+#R=_alpha2
+R=
+BUILD_NUM=1375965195
 P1=logitechmediaserver-bin-$(PV)
+P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
 DF=$(P)-$(PV).tgz
 SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
-SRC_DIR=LogitechMediaServer_v$(PV)
 P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM)
 EB=$(P1)$(R).ebuild
 
@@ -62,8 +63,8 @@ prebuiltfiles.txt: $(DFDIR)/$(DF)
 	./mkprebuilt $^ $(P_BUILD_NUM) opt/logitechmediaserver >$@
 
 stage: patches prebuiltfiles.txt
-	-rm -r $(STAGEDIR)
-	mkdir -p $(STAGEDIR)/files
+	#-rm -r $(STAGEDIR)
+	#mkdir -p $(STAGEDIR)/files
 	cp metadata.xml $(STAGEDIR)
 	cp files/* $(STAGEDIR)/files
 	cp patch_dest/* $(STAGEDIR)/files
@@ -81,7 +82,7 @@ inject: stage inject_distfiles
 	$(SCP) package.keywords package.use package.unmask root@$(VMHOST):/etc/portage
 
 overlay: stage
-	# The following ensures that we're on a feature branch
+	# The following ensures our overlay project is on a feature branch
 	(cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* ]])
 	-rm -rf "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)" 2>/dev/null
 	cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
@@ -116,10 +117,10 @@ uninstall:
 	-$(SSH) rm -fr /etc/init.d/logitechmediaserver /etc/conf.d/logitechmediaserver /etc/logrotate.d/logitechmediaserver
 	-$(SSH) rm -fr /etc/logitechmediaserver /var/log/logitechmediaserver /var/lib/logitechmediaserver /opt/logitechmediaserver
 
-patches: $(PD)/$(P1)-client-playlists-gentoo.patch $(PD)/$(P1)-uuid-gentoo.patch
+patches: $(PD)/$(P2)-client-playlists-gentoo.patch $(PD)/$(P2)-uuid-gentoo.patch
 
-$(PD)/$(P1)-uuid-gentoo.patch: $(PS)/slimserver.pl
+$(PD)/$(P2)-uuid-gentoo.patch: $(PS)/slimserver.pl
 	./mkpatch $@ $^
 
-$(PD)/$(P1)-client-playlists-gentoo.patch: $(PS)/Slim/Player/Playlist.pm
+$(PD)/$(P2)-client-playlists-gentoo.patch: $(PS)/Slim/Player/Playlist.pm
 	./mkpatch $@ $^
