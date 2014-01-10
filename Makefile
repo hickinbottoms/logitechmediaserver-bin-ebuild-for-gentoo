@@ -1,13 +1,13 @@
 VIRSH_URI=qemu:///system
 VIRSH_DOMAIN=scebuild
 VIRSH_RESET_SNAPSHOT=clean-base-7
-VMHOST=chandra
+VMHOST=chandra2
 IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
 SCP=scp -i ~/.ssh/$(IDENT_HOST)
 DFDIR=distfiles
 GETCMD=aria2c --conditional-get=true --dir=$(DFDIR)
-RSYNC=rsync -az
+RSYNC=rsync -a -e "ssh -i /home/stuarth/.ssh/${IDENT_HOST}"
 
 LOCAL_PORTAGE=/usr/local/portage
 EBUILD_PREFIX=logitechmediaserver-bin
@@ -27,16 +27,13 @@ PD=patch_dest
 # what would be in the portage tree).
 PATCH_PV=7.7.2-4
 
-PV=7.7.3
-#R=_alpha2
-R=
-BUILD_NUM=1375965195
+PV=7.8
+R=_pre20140105
+COMMIT=cd49c0fd9518fdc978d8e32c668c76f506ad5bbd
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
 DF=$(P)-$(PV).tgz
-SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
-P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM)
 EB=$(P1)$(R).ebuild
 
 FILES=logitechmediaserver.init.d \
@@ -58,9 +55,9 @@ portagepatch:
 	make $(STAGEDIR) >/dev/null
 	git diff --patch --stat $(PATCH_PV) -- $(STAGEDIR)
 
-prebuiltfiles.txt: $(DFDIR)/$(DF)
+prebuiltfiles.txt: $(DFDIR)/$(COMMIT).zip
 	echo "Identifying prebuilt binaries in distfile"
-	./mkprebuilt $^ $(P_BUILD_NUM) opt/logitechmediaserver >$@
+	./mkprebuilt $^ "slimserver-$(COMMIT)" "opt/" >$@
 
 stage: patches prebuiltfiles.txt
 	#-rm -r $(STAGEDIR)
@@ -88,11 +85,8 @@ overlay: stage
 	cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
 	#(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
 
-inject_distfiles: $(DFDIR)/$(DF)
-	$(RSYNC) $^ root@$(VMHOST):/usr/portage/distfiles
-
-$(DFDIR)/$(DF):
-	$(GETCMD) "$(SRC_URI)"
+inject_distfiles:
+	$(RSYNC) $(DFDIR)/ root@$(VMHOST):/usr/portage/distfiles
 
 vmreset:
 	echo Resetting VM...
