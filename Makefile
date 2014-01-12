@@ -38,6 +38,7 @@ EB=$(P1)$(R).ebuild
 
 FILES=logitechmediaserver.init.d \
 	  logitechmediaserver.conf.d \
+	  logitechmesiaserver.service \
 	  logitechmediaserver.logrotate.d \
 	  Gentoo-plugins-README.txt \
 	  Gentoo-detailed-changelog.txt \

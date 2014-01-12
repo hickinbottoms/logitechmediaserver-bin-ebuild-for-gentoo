@@ -6,15 +6,11 @@ EAPI="3"
 
 MY_PN="${PN/-bin}"
 
-#if [[ ${PV} == *_pre* ]] ; then
-#	EGIT_REPO_URI="http://github.com/Logitech/slimserver.git"
-#	EGIT_MASTER="public/${PV/_pre*}"
-#	HOMEPAGE="http://github.com/Logitech/slimserver"
-#	INHERIT_VCS="git-2"
 if [[ ${PV} == *_pre* ]] ; then
 	GIT_COMMIT="cd49c0fd9518fdc978d8e32c668c76f506ad5bbd"
 	SRC_URI="https://github.com/Logitech/slimserver/archive/${GIT_COMMIT}.zip"
 	HOMEPAGE="http://github.com/Logitech/slimserver"
+	S="${WORKDIR}/slimserver-${GIT_COMMIT}"
 	INHERIT_VCS=""
 else
 	SRC_DIR="LogitechMediaServer_v${PV}"
@@ -28,7 +24,7 @@ else
 	INHERIT_VCS=""
 fi
 
-inherit ${INHERIT_VCS} eutils user
+inherit ${INHERIT_VCS} eutils user systemd
 
 KEYWORDS="~amd64 ~x86"
 
@@ -50,8 +46,8 @@ RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
-	x86? ( <=dev-lang/perl-5.16[ithreads] )
-	amd64? ( <=dev-lang/perl-5.18[ithreads] )
+	x86? ( <dev-lang/perl-5.17[ithreads] )
+	amd64? ( <dev-lang/perl-5.19[ithreads] )
 	>=dev-perl/Data-UUID-1.202
 	"
 
@@ -619,7 +615,6 @@ QA_PREBUILT="
 	opt/logitechmediaserver/CPAN/arch/5.8/x86_64-linux-thread-multi/auto/XML/Parser/Expat/Expat.so
 	opt/logitechmediaserver/CPAN/arch/5.8/x86_64-linux-thread-multi/auto/YAML/XS/LibYAML/LibYAML.so
 "
-S="${WORKDIR}/slimserver-${GIT_COMMIT}"
 
 RUN_UID=logitechmediaserver
 RUN_GID=logitechmediaserver
@@ -680,9 +675,12 @@ src_install() {
 	fowners ${RUN_UID}:${RUN_GID} "${PREFSDIR}"
 	fperms 770 "${PREFSDIR}"
 
-	# Install init scripts
+	# Install init scripts (OpenRC)
 	newconfd "${FILESDIR}/logitechmediaserver.conf.d" "${MY_PN}"
 	newinitd "${FILESDIR}/logitechmediaserver.init.d" "${MY_PN}"
+
+	# Install unit file (systemd)
+	systemd_dounit "${FILESDIR}/${MY_PN}.service"
 
 	# Initialize run directory (where the PID file lives)
 	dodir "${RUNDIR}"
@@ -721,12 +719,16 @@ src_install() {
 }
 
 lms_starting_instr() {
-	elog "Logitech Media Server can be started with the following command:"
+	elog "Logitech Media Server can be started with the following command (OpenRC):"
 	elog "\t/etc/init.d/logitechmediaserver start"
+	elog "or (systemd):"
+	elog "\tsystemctl start logitechmediaserver"
 	elog ""
 	elog "Logitech Media Server can be automatically started on each boot"
-	elog "with the following command:"
+	elog "with the following command (OpenRC):"
 	elog "\trc-update add logitechmediaserver default"
+	elog "or (systemd):"
+	elog "\tsystemctl enable logitechmediaserver"
 	elog ""
 	elog "You might want to examine and modify the following configuration"
 	elog "file before starting Logitech Media Server:"

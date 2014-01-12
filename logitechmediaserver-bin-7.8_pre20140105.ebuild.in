@@ -24,7 +24,7 @@ else
 	INHERIT_VCS=""
 fi
 
-inherit ${INHERIT_VCS} eutils user
+inherit ${INHERIT_VCS} eutils user systemd
 
 KEYWORDS="~amd64 ~x86"
 
@@ -46,8 +46,8 @@ RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
-	x86? ( <=dev-lang/perl-5.16[ithreads] )
-	amd64? ( <=dev-lang/perl-5.18[ithreads] )
+	x86? ( <dev-lang/perl-5.17[ithreads] )
+	amd64? ( <dev-lang/perl-5.19[ithreads] )
 	>=dev-perl/Data-UUID-1.202
 	"
 
@@ -117,9 +117,12 @@ src_install() {
 	fowners ${RUN_UID}:${RUN_GID} "${PREFSDIR}"
 	fperms 770 "${PREFSDIR}"
 
-	# Install init scripts
+	# Install init scripts (OpenRC)
 	newconfd "${FILESDIR}/logitechmediaserver.conf.d" "${MY_PN}"
 	newinitd "${FILESDIR}/logitechmediaserver.init.d" "${MY_PN}"
+
+	# Install unit file (systemd)
+	systemd_dounit "${FILESDIR}/${MY_PN}.service"
 
 	# Initialize run directory (where the PID file lives)
 	dodir "${RUNDIR}"
@@ -158,12 +161,16 @@ src_install() {
 }
 
 lms_starting_instr() {
-	elog "Logitech Media Server can be started with the following command:"
+	elog "Logitech Media Server can be started with the following command (OpenRC):"
 	elog "\t/etc/init.d/logitechmediaserver start"
+	elog "or (systemd):"
+	elog "\tsystemctl start logitechmediaserver"
 	elog ""
 	elog "Logitech Media Server can be automatically started on each boot"
-	elog "with the following command:"
+	elog "with the following command (OpenRC):"
 	elog "\trc-update add logitechmediaserver default"
+	elog "or (systemd):"
+	elog "\tsystemctl enable logitechmediaserver"
 	elog ""
 	elog "You might want to examine and modify the following configuration"
 	elog "file before starting Logitech Media Server:"
