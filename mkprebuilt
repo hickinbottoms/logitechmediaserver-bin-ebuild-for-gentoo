@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -w 
 
 # Identify the list of prebuild executables within a LMS distribution
 # tarball. This is used to populate the QA_PREBUILT variable in the
@@ -19,7 +19,9 @@ my $tgz=$ARGV[0];
 my $oldprefix=$ARGV[1];
 my $newprefix=$ARGV[2];
 
-my $tarcatcmd = "tar tf '" . $tgz . "'";
+my $tarcatcmd;
+if ($tgz =~ /\.tgz$/) { $tarcatcmd = "tar tf '" . $tgz . "'" };
+if ($tgz =~ /\.zip$/) { $tarcatcmd = "unzip -Z -1 '" . $tgz . "'" };
 
 open my $pipe, "$tarcatcmd |";
 while (<$pipe>) {
