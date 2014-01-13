@@ -39,8 +39,6 @@ start() {
 		--cachedir=${cachedir} \
 		--prefsdir=${prefsdir} \
 		--logdir=${logdir} \
-		--audiodir=${LMS_MUSIC_DIR} \
-		--playlistdir=${LMS_PLAYLISTS_DIR} \
 		${LMS_OPTS}
 
 	eend $? "Failed to start Logitech Media Server"
