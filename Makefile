@@ -1,7 +1,7 @@
 VIRSH_URI=qemu:///system
 VIRSH_DOMAIN=scebuild
-VIRSH_RESET_SNAPSHOT=clean-base-7
-VMHOST=chandra2
+VIRSH_RESET_SNAPSHOT=clean-base-6
+VMHOST=chandra
 IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
 SCP=scp -i ~/.ssh/$(IDENT_HOST)
@@ -21,19 +21,15 @@ GPG_KEYID=6C0371E6
 PS=patch_source
 PD=patch_dest
 
-# PATCH_PV is the version that our diff patch is produced against. This allows
-# me to send Joe a patch that shows the changes I have made in just the stage
-# directory (ie ignoring all the ebuild generation crud and concentrating on
-# what would be in the portage tree).
-PATCH_PV=7.7.2-4
-
-PV=7.8
-R=_pre20140105
-COMMIT=cd49c0fd9518fdc978d8e32c668c76f506ad5bbd
+PV=7.8.0
+R=
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
 DF=$(P)-$(PV).tgz
+SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
+P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM) 
+P3=$(P)-$(PV)
 EB=$(P1)$(R).ebuild
 
 FILES=logitechmediaserver.init.d \
@@ -46,19 +42,9 @@ FILES=logitechmediaserver.init.d \
 
 all: inject
 
-# Produce a patch I can send to Joe. This produces differences just for the
-# stage directory so this concentrates on the changes needed to the portage
-# folder only. This diffs the working tree's stage folder against a previous
-# formal git tag, so it first makes sure the stage folder reflects the
-# current working tree's version of the ebuild and the patches are generated
-# etc.
-portagepatch:
-	make $(STAGEDIR) >/dev/null
-	git diff --patch --stat $(PATCH_PV) -- $(STAGEDIR)
-
-prebuiltfiles.txt: $(DFDIR)/$(COMMIT).zip
+prebuiltfiles.txt: $(DFDIR)/$(DF)
 	echo "Identifying prebuilt binaries in distfile"
-	./mkprebuilt $^ "slimserver-$(COMMIT)" "opt/" >$@
+	./mkprebuilt $^ $(P3) opt/logitechmediaserver >$@
 
 stage: patches prebuiltfiles.txt
 	#-rm -r $(STAGEDIR)
@@ -68,6 +54,7 @@ stage: patches prebuiltfiles.txt
 	cp patch_dest/* $(STAGEDIR)/files
 	A=`grep '$$Id' $(STAGEDIR)/files/*.patch | wc -l`; [ $$A -eq 0 ]
 	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"$(STAGEDIR)/$(EB)"
+	-rm $(STAGEDIR)/Manifest
 	(cd $(STAGEDIR); ebuild `ls *.ebuild | head -n 1` manifest)
 
 inject: stage inject_distfiles
@@ -86,8 +73,11 @@ overlay: stage
 	cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
 	#(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
 
-inject_distfiles:
-	$(RSYNC) $(DFDIR)/ root@$(VMHOST):/usr/portage/distfiles
+inject_distfiles: $(DFDIR)/$(DF)
+	$(RSYNC) $^ root@$(VMHOST):/usr/portage/distfiles
+
+$(DFDIR)/$(DF): 
+	$(GETCMD) "$(SRC_URI)"   
 
 vmreset:
 	echo Resetting VM...
