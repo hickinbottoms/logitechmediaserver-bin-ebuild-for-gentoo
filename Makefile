@@ -21,9 +21,9 @@ GPG_KEYID=6C0371E6
 PS=patch_source
 PD=patch_dest
 
-PV=7.8.1
-R=_pre20140927
-COMMIT=46bfa033e5ab0f431f84613f31d8431da048da86
+PV=7.9.0
+R=_pre20140928
+COMMIT=c05d9360b3d2141eaa2083237243777f8dd1cb42
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
@@ -101,13 +101,10 @@ uninstall:
 	-$(SSH) rm -fr /etc/init.d/logitechmediaserver /etc/conf.d/logitechmediaserver /etc/logrotate.d/logitechmediaserver
 	-$(SSH) rm -fr /etc/logitechmediaserver /var/log/logitechmediaserver /var/lib/logitechmediaserver /opt/logitechmediaserver
 
-patches: $(PD)/$(P2)-client-playlists-gentoo.patch $(PD)/$(P2)-uuid-gentoo.patch $(PD)/$(P2)-fix-transition-sample-rates2.patch
+patches: $(PD)/$(P2)-client-playlists-gentoo.patch $(PD)/$(P2)-uuid-gentoo.patch
 
 $(PD)/$(P2)-uuid-gentoo.patch: $(PS)/slimserver.pl
 	./mkpatch $@ $^
 
 $(PD)/$(P2)-client-playlists-gentoo.patch: $(PS)/Slim/Player/Playlist.pm
-	./mkpatch $@ $^
-
-$(PD)/$(P2)-fix-transition-sample-rates2.patch: $(PS)/Slim/Player/ReplayGain.pm $(PS)/Slim/Player/Squeezebox.pm
 	./mkpatch $@ $^
