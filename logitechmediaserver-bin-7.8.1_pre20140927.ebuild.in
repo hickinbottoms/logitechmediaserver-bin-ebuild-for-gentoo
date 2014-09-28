@@ -7,7 +7,7 @@ EAPI="3"
 MY_PN="${PN/-bin}"
 
 if [[ ${PV} == *_pre* ]] ; then
-	GIT_COMMIT="cd49c0fd9518fdc978d8e32c668c76f506ad5bbd"
+	GIT_COMMIT="46bfa033e5ab0f431f84613f31d8431da048da86"
 	SRC_URI="https://github.com/Logitech/slimserver/archive/${GIT_COMMIT}.zip"
 	HOMEPAGE="http://github.com/Logitech/slimserver"
 	S="${WORKDIR}/slimserver-${GIT_COMMIT}"
@@ -47,7 +47,7 @@ RDEPEND="
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
 	x86? ( <dev-lang/perl-5.17[ithreads] )
-	amd64? ( <dev-lang/perl-5.19[ithreads] )
+	amd64? ( <dev-lang/perl-5.21[ithreads] )
 	>=dev-perl/Data-UUID-1.202
 	"
 
@@ -63,7 +63,6 @@ RUN_GID=logitechmediaserver
 
 # Installation locations
 OPTDIR="/opt/${MY_PN}"
-RUNDIR="/var/run/${MY_PN}"
 VARDIR="/var/lib/${MY_PN}"
 CACHEDIR="${VARDIR}/cache"
 USRPLUGINSDIR="${VARDIR}/Plugins"
@@ -93,7 +92,6 @@ src_prepare() {
 
 	# Add some enhancement patches of my own.
 	epatch "${FILESDIR}/${P}-fix-transition-sample-rates2.patch"
-	epatch "${FILESDIR}/${P}-remove-softlink-target-check.patch"
 }
 
 src_install() {
@@ -123,11 +121,6 @@ src_install() {
 
 	# Install unit file (systemd)
 	systemd_dounit "${FILESDIR}/${MY_PN}.service"
-
-	# Initialize run directory (where the PID file lives)
-	dodir "${RUNDIR}"
-	fowners ${RUN_UID}:${RUN_GID} "${RUNDIR}"
-	fperms 770 "${RUNDIR}"
 
 	# Initialize server cache directory
 	dodir "${CACHEDIR}"

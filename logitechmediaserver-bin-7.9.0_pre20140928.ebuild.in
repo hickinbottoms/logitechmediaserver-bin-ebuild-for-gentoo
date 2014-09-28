@@ -1,31 +1,44 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header$
 
 EAPI="3"
 
-inherit eutils user
-
-BUILD_NUM="33893"
-SRC_DIR="LogitechMediaServer_v${PV}"
 MY_PN="${PN/-bin}"
-MY_P_BUILD_NUM="${MY_PN}-${PV}-${BUILD_NUM}"
-MY_P="${MY_PN}-${PV}"
+
+if [[ ${PV} == *_pre* ]] ; then
+	GIT_COMMIT="c05d9360b3d2141eaa2083237243777f8dd1cb42"
+	SRC_URI="https://github.com/Logitech/slimserver/archive/${GIT_COMMIT}.zip"
+	HOMEPAGE="http://github.com/Logitech/slimserver"
+	S="${WORKDIR}/slimserver-${GIT_COMMIT}"
+	INHERIT_VCS=""
+else
+	SRC_DIR="LogitechMediaServer_v${PV}"
+	SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P}.tgz"
+	HOMEPAGE="http://www.mysqueezebox.com/download"
+	BUILD_NUM="1375965195"
+	MY_PV="${PV/_*}"
+	MY_P_BUILD_NUM="${MY_PN}-${MY_PV}-${BUILD_NUM}"
+	MY_P="${MY_PN}-${MY_PV}"
+	S="${WORKDIR}/${MY_P_BUILD_NUM}"
+	INHERIT_VCS=""
+fi
+
+inherit ${INHERIT_VCS} eutils user systemd
+
+KEYWORDS="~amd64 ~x86"
 
 DESCRIPTION="Logitech Media Server (streaming audio server)"
-HOMEPAGE="http://www.mysqueezebox.com/download"
 LICENSE="${PN}"
 RESTRICT="bindist mirror"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
 IUSE=""
-
-SRC_URI="http://downloads.slimdevices.com/${SRC_DIR}/${MY_P}.tgz"
 
 # Installation dependencies.
 DEPEND="
 	!media-sound/squeezecenter
 	!media-sound/squeezeboxserver
+	app-arch/unzip
 	"
 
 # Runtime dependencies.
@@ -33,7 +46,8 @@ RDEPEND="
 	!prefix? ( >=sys-apps/baselayout-2.0.0 )
 	!prefix? ( virtual/logger )
 	>=dev-lang/perl-5.8.8[ithreads]
-	<dev-lang/perl-5.15[ithreads]
+	x86? ( <dev-lang/perl-5.19[ithreads] )
+	amd64? ( <dev-lang/perl-5.21[ithreads] )
 	>=dev-perl/Data-UUID-1.202
 	"
 
@@ -44,14 +58,11 @@ QA_PREBUILT="
 @@QA_PREBUILT@@
 "
 
-S="${WORKDIR}/${MY_P_BUILD_NUM}"
-
 RUN_UID=logitechmediaserver
 RUN_GID=logitechmediaserver
 
 # Installation locations
 OPTDIR="/opt/${MY_PN}"
-RUNDIR="/var/run/${MY_PN}"
 VARDIR="/var/lib/${MY_PN}"
 CACHEDIR="${VARDIR}/cache"
 USRPLUGINSDIR="${VARDIR}/Plugins"
@@ -75,7 +86,7 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# Apply patches
+	# Apply patches to make LMS work on Gentoo.
 	epatch "${FILESDIR}/${P}-uuid-gentoo.patch"
 	epatch "${FILESDIR}/${P}-client-playlists-gentoo.patch"
 }
@@ -101,14 +112,12 @@ src_install() {
 	fowners ${RUN_UID}:${RUN_GID} "${PREFSDIR}"
 	fperms 770 "${PREFSDIR}"
 
-	# Install init scripts
+	# Install init scripts (OpenRC)
 	newconfd "${FILESDIR}/logitechmediaserver.conf.d" "${MY_PN}"
 	newinitd "${FILESDIR}/logitechmediaserver.init.d" "${MY_PN}"
 
-	# Initialize run directory (where the PID file lives)
-	dodir "${RUNDIR}"
-	fowners ${RUN_UID}:${RUN_GID} "${RUNDIR}"
-	fperms 770 "${RUNDIR}"
+	# Install unit file (systemd)
+	systemd_dounit "${FILESDIR}/${MY_PN}.service"
 
 	# Initialize server cache directory
 	dodir "${CACHEDIR}"
@@ -142,12 +151,16 @@ src_install() {
 }
 
 lms_starting_instr() {
-	elog "Logitech Media Server can be started with the following command:"
+	elog "Logitech Media Server can be started with the following command (OpenRC):"
 	elog "\t/etc/init.d/logitechmediaserver start"
+	elog "or (systemd):"
+	elog "\tsystemctl start logitechmediaserver"
 	elog ""
 	elog "Logitech Media Server can be automatically started on each boot"
-	elog "with the following command:"
+	elog "with the following command (OpenRC):"
 	elog "\trc-update add logitechmediaserver default"
+	elog "or (systemd):"
+	elog "\tsystemctl enable logitechmediaserver"
 	elog ""
 	elog "You might want to examine and modify the following configuration"
 	elog "file before starting Logitech Media Server:"

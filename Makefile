@@ -6,7 +6,7 @@ IDENT_HOST=chandra
 SSH=ssh root@$(VMHOST) -i ~/.ssh/$(IDENT_HOST)
 SCP=scp -i ~/.ssh/$(IDENT_HOST)
 DFDIR=distfiles
-GETCMD=aria2c --conditional-get=true --dir=$(DFDIR)
+GETCMD=aria2c --conditional-get=true --check-certificate=false --dir=$(DFDIR)
 RSYNC=rsync -a -e "ssh -i /home/stuarth/.ssh/${IDENT_HOST}"
 
 LOCAL_PORTAGE=/usr/local/portage
@@ -21,15 +21,14 @@ GPG_KEYID=6C0371E6
 PS=patch_source
 PD=patch_dest
 
-PV=7.8.0
-R=
+PV=7.9.0
+R=_pre20140928
+COMMIT=c05d9360b3d2141eaa2083237243777f8dd1cb42
 P1=logitechmediaserver-bin-$(PV)
 P2=logitechmediaserver-bin-$(PV)$(R)
 P=logitechmediaserver
 DF=$(P)-$(PV).tgz
-SRC_URI=http://downloads.slimdevices.com/LogitechMediaServer_v$(PV)/$(P)-$(PV).tgz
-P_BUILD_NUM=$(P)-$(PV)-$(BUILD_NUM) 
-P3=$(P)-$(PV)
+SRC_URI=https://github.com/Logitech/slimserver/archive/$(COMMIT).zip
 EB=$(P1)$(R).ebuild
 
 FILES=logitechmediaserver.init.d \
@@ -42,13 +41,13 @@ FILES=logitechmediaserver.init.d \
 
 all: inject
 
-prebuiltfiles.txt: $(DFDIR)/$(DF)
+prebuiltfiles.txt: $(DFDIR)/$(COMMIT).zip
 	echo "Identifying prebuilt binaries in distfile"
-	./mkprebuilt $^ $(P3) opt/logitechmediaserver >$@
+	./mkprebuilt $^ "slimserver-$(COMMIT)" opt/logitechmediaserver >$@
 
 stage: patches prebuiltfiles.txt
 	#-rm -r $(STAGEDIR)
-	#mkdir -p $(STAGEDIR)/files
+	mkdir -p $(STAGEDIR)/files
 	cp metadata.xml $(STAGEDIR)
 	cp files/* $(STAGEDIR)/files
 	cp patch_dest/* $(STAGEDIR)/files
@@ -73,10 +72,10 @@ overlay: stage
 	cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
 	#(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
 
-inject_distfiles: $(DFDIR)/$(DF)
-	$(RSYNC) $^ root@$(VMHOST):/usr/portage/distfiles
+inject_distfiles:
+	$(RSYNC) $(DFDIR)/ root@$(VMHOST):/usr/portage/distfiles
 
-$(DFDIR)/$(DF): 
+$(DFDIR)/$(COMMIT).zip: 
 	$(GETCMD) "$(SRC_URI)"   
 
 vmreset:
