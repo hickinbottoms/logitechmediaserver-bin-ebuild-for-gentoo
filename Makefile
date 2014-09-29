@@ -24,12 +24,12 @@ PD=patch_dest
 PV=7.9.0
 R=_pre20140928
 COMMIT=c05d9360b3d2141eaa2083237243777f8dd1cb42
-P1=logitechmediaserver-bin-$(PV)
-P2=logitechmediaserver-bin-$(PV)$(R)
-P=logitechmediaserver
-DF=$(P)-$(PV).tgz
+P=logitechmediaserver-bin
+P1=$(P)-$(PV)
+P2=$(P)-$(PV)$(R)
 SRC_URI=https://github.com/Logitech/slimserver/archive/$(COMMIT).zip
 EB=$(P1)$(R).ebuild
+EB9999=$(P)-9999.ebuild
 
 FILES=logitechmediaserver.init.d \
 	  logitechmediaserver.conf.d \
@@ -53,6 +53,7 @@ stage: patches prebuiltfiles.txt
 	cp patch_dest/* $(STAGEDIR)/files
 	A=`grep '$$Id' $(STAGEDIR)/files/*.patch | wc -l`; [ $$A -eq 0 ]
 	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"$(STAGEDIR)/$(EB)"
+	sed -e "s/@@QA_PREBUILT@@/*/" < "$(EB).in" >"$(STAGEDIR)/$(EB9999)"
 	-rm $(STAGEDIR)/Manifest
 	(cd $(STAGEDIR); ebuild `ls *.ebuild | head -n 1` manifest)
 

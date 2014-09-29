@@ -48,13 +48,14 @@ local testing before tagging and release.
 
 USING THESE EBUILDS
 
-The "stage" subdirectory contains an image of the ebuild tree. If you want to
-try this version of the ebuild out then installing this stage directory is the
-most convenient way of doing it.
+The "media-sound/logitechmediaserver-bin" subdirectory contains an image of the
+ebuild tree. If you want to try this version of the ebuild out then installing
+this directory is the most convenient way of doing it.
 
-1. Copy "stage" to "/usr/local/portage/media-sound/logitechmediaserver-bin"
+1. Copy "media-sound/logitechmediaserver-bin" to
+      "/usr/local/portage/media-sound/logitechmediaserver-bin"
 
-2. Generate the "manifest" file for the ebuild:
+2. Generate the "Manifest" file for the ebuild:
       ebuild /usr/local/portage/media-sound/logitechmediaserver-bin/lo* digest
 
 3. Ensure that /etc/make.conf includes the local Portage tree so that this
