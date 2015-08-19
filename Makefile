@@ -59,7 +59,7 @@ stage: patches prebuiltfiles.txt
 
 overlay: stage
 	# The following ensures our overlay project is on a feature branch
-	(cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* ]])
+	(cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* || `git rev-parse --abbrev-ref HEAD` == hotfix/* ]])
 	rsync -a --delete $(EBUILD_CATEGORY) $(OVERLAY_DIR)/$(EBUILD_CATEGORY2)
 	#-rm -rf "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)" 2>/dev/null
 	#cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
