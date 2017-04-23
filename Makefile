@@ -22,7 +22,8 @@ PS=patch_source
 PD=patch_dest
 
 PV=7.9.0
-R=_pre20150812
+#R=_pre20150812
+R=
 COMMIT=c17601c5892eaac40a359d1392e454ad5c69db9d
 P=logitechmediaserver-bin
 P1=$(P)-$(PV)

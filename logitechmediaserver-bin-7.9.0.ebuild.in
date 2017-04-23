@@ -61,7 +61,7 @@ RDEPEND="
 # files. We need to identify those to suppress the QA warnings during
 # installation.
 QA_PREBUILT="
-*
+@@QA_PREBUILT@@
 "
 
 RUN_UID=logitechmediaserver
