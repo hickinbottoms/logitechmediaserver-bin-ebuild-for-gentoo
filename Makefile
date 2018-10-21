@@ -15,16 +15,16 @@ EBUILD_CATEGORY2=media-sound
 EBUILD_CATEGORY=$(EBUILD_CATEGORY2)/$(EBUILD_PREFIX)
 EBUILD_DIR=$(LOCAL_PORTAGE)/$(EBUILD_CATEGORY)
 STAGEDIR=$(EBUILD_CATEGORY)
-OVERLAY_DIR=$(HOME)/code/gentoo/squeezebox-overlay
+OVERLAY_DIR=$(HOME)/code/gentoo/gentoo-squeezebox-overlay
 GPG_KEYID=6C0371E6
 
 PS=patch_source
 PD=patch_dest
 
-PV=7.9.0
+PV=7.9.1
 #R=_pre20150812
 R=
-COMMIT=c17601c5892eaac40a359d1392e454ad5c69db9d
+COMMIT=88daad22b197aafc8bda08ee8cfe81dd76c4a694
 P=logitechmediaserver-bin
 P1=$(P)-$(PV)
 P2=$(P)-$(PV)$(R)
@@ -47,7 +47,7 @@ prebuiltfiles.txt: $(DFDIR)/$(COMMIT).zip
 	./mkprebuilt $^ "slimserver-$(COMMIT)" opt/logitechmediaserver >$@
 
 stage: patches prebuiltfiles.txt
-	#-rm -r $(STAGEDIR)
+	-rm -r $(STAGEDIR)
 	mkdir -p $(STAGEDIR)/files
 	cp metadata.xml $(STAGEDIR)
 	cp files/* $(STAGEDIR)/files
@@ -56,18 +56,19 @@ stage: patches prebuiltfiles.txt
 	sed -e "/@@QA_PREBUILT@@/r prebuiltfiles.txt" -e "/@@QA_PREBUILT@@/d" < "$(EB).in" >"$(STAGEDIR)/$(EB)"
 	sed -e "s/@@QA_PREBUILT@@/*/" < "$(EB).in" >"$(STAGEDIR)/$(EB9999)"
 	-rm $(STAGEDIR)/Manifest
-	(cd $(STAGEDIR); ebuild `ls *.ebuild | head -n 1` manifest)
+#	(cd $(STAGEDIR); ebuild `ls *.ebuild | head -n 1` manifest)
 
 overlay: stage
-	# The following ensures our overlay project is on a feature branch
-	(cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* || `git rev-parse --abbrev-ref HEAD` == hotfix/* ]])
-	rsync -a --delete $(EBUILD_CATEGORY) $(OVERLAY_DIR)/$(EBUILD_CATEGORY2)
-	#-rm -rf "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)" 2>/dev/null
-	#cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
-	#(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
+	 # The following ensures our overlay project is on a feature branch
+	 (cd "$(OVERLAY_DIR)"; [[ `git rev-parse --abbrev-ref HEAD` == feature/* || `git rev-parse --abbrev-ref HEAD` == hotfix/* ]])
+	 rsync -a $(EBUILD_CATEGORY) $(OVERLAY_DIR)/$(EBUILD_CATEGORY2)
+	 -rm "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)/Manifest
+	 #-rm -rf "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)" 2>/dev/null
+	 #cp -r "$(STAGEDIR)" "$(OVERLAY_DIR)/$(EBUILD_CATEGORY2)"
+	 #(cd "$(OVERLAY_DIR)/$(EBUILD_CATEGORY)"; gpg --clearsign --default-key $(GPG_KEYID) Manifest; mv Manifest.asc Manifest)
 
 $(DFDIR)/$(COMMIT).zip: 
-	$(GETCMD) "$(SRC_URI)"   
+$(GETCMD) "$(SRC_URI)" -o "$@"
 
 patches: $(PD)/$(P2)-client-playlists-gentoo.patch $(PD)/$(P2)-uuid-gentoo.patch
 
